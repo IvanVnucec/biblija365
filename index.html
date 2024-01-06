@@ -64,7 +64,7 @@
 
             const reading = readingsList[dayOfYear-1];
             document.getElementById('reading').innerText = reading;
-            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&id40=1&set=1&l=en`;
+            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
 
             const src = constructSourceUrl(dayOfYear);
             document.getElementById('audio').src = src;
