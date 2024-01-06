@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblija365</title>
+    <script src="readings.js"></script>
+</head>
+<body>
+    <h1>Biblija365</h1>
+    <p>Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.</p>
+    <h2 id="day_of_year"></h2>
+    <figure>Izvor: <cite><a id="reading" target="_blank"></a></cite></figure>
+    <figure id="figure">
+        <figcaption>Poslušajte čitanje:</figcaption>
+        <audio id="audio" controls preload="metadata"></audio>
+    </figure>
+    <p id="pagination"></p>
+    <div>
+        <small>Preuzeto sa: <a href="https://www.radiomarija.hr">radiomarija.hr</a>.</small>
+    </div>
+    <div>
+        <small>Autor: <a href="https://github.com/IvanVnucec">Ivan Vnučec</a>, 2024.</small>
+    </div>
+
+    <script>
+        function getDayOfTheYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = (date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            // do not count leap year day
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const isLeapYear = (year % 100 === 0) ? (year % 400 === 0) : (year % 4 === 0);
+            const afterFeb29 = month > 2 || (month === 2 && day > 29);
+            if (isLeapYear && afterFeb29) {
+                return dayOfYear - 1;
+            }
+            return dayOfYear;
+        }
+
+        function constructSourceUrl(dayOfYear) {
+            const start = new Date(2022, 0, 0);
+            const diff = dayOfYear * 24 * 60 * 60 * 1000;
+            const date = new Date(start.getTime() + diff);
+            const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(date.getDate()).padStart(2, '0');
+            return `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
+        }
+
+        function onLoad() {
+            var dayOfYear = getDayOfTheYear(new Date());
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('day')) {
+                const dayParsed = parseInt(urlParams.get('day'));
+                if (dayParsed > 0 && dayParsed < 366) {
+                    dayOfYear = dayParsed;
+                }
+            }
+            document.getElementById('day_of_year').innerText = `Dan ${dayOfYear}:`;
+
+            const reading = readingsList[dayOfYear-1];
+            document.getElementById('reading').innerText = reading;
+            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&id40=1&set=1&l=en`;
+
+            const src = constructSourceUrl(dayOfYear);
+            document.getElementById('audio').src = src;
+            document.getElementById('audio').innerHTML = `<p>Preuzmi <a href="${src}">MP3</a> audio datoteku.</p>`;
+
+            // pagination
+            document.getElementById('pagination').innerHTML = `
+                <a href="?day=${dayOfYear > 1 ? dayOfYear-1 : 1}">Prethodni dan</a>
+                |
+                <a href="index.html">Danas</a>
+                |
+                <a href="?day=${dayOfYear < 365 ? dayOfYear+1 : 365}">Slijedeći dan</a>
+            `;
+        }
+
+        window.onload = onLoad;
+    </script>
+</body>
+</html>
