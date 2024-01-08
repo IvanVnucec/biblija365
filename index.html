@@ -24,65 +24,52 @@
     <script>
         function getDayOfTheYear(date) {
             const start = new Date(date.getFullYear(), 0, 0);
-            const diff = (date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
+            const diff = (date - start);
             const oneDay = 1000 * 60 * 60 * 24;
-            const dayOfYear = Math.floor(diff / oneDay);
-
-            // do not count leap year day
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-            const day = date.getDate();
-            const isLeapYear = (year % 100 === 0) ? (year % 400 === 0) : (year % 4 === 0);
-            const afterFeb29 = month > 2 || (month === 2 && day > 29);
-            if (isLeapYear && afterFeb29) {
-                return dayOfYear - 1;
-            }
-            return dayOfYear;
+            return Math.floor(diff / oneDay);
         }
 
-        function constructMp3SourceUrl(dayOfYear) {
-            const start = new Date(2022, 0, 0);
-            const diff = dayOfYear * 24 * 60 * 60 * 1000;
-            const date = new Date(start.getTime() + diff);
+        function renderForDate(date) {
+            const dayOfTheYear = getDayOfTheYear(date);
+            document.getElementById('day_of_year').innerText = `Dan ${dayOfTheYear}:`;
+
             const monthStr = String(date.getMonth() + 1).padStart(2, '0');
             const dayStr = String(date.getDate()).padStart(2, '0');
-            return `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
-        }
-
-        function onLoad() {
-            var dayOfYear = getDayOfTheYear(new Date());
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('day')) {
-                const dayParsed = parseInt(urlParams.get('day'));
-                if (dayParsed > 0 && dayParsed < 366) {
-                    dayOfYear = dayParsed;
-                }
-            }
-            document.getElementById('day_of_year').innerText = `Dan ${dayOfYear}:`;
-
-            const reading = readingsList[dayOfYear-1];
+            const reading = readingsList[`${monthStr}${dayStr}`];
             document.getElementById('reading').innerText = reading;
             document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
 
-            // TODO: add audio for 29.2. and 30.7.
-            const isDay211 = dayOfYear == 211; // 30.7.
-            if (isDay211) {
-                document.getElementById('audio').innerHTML = `<div>Nažalost, za ovaj dan nema snimljenog čitanja.</div>`;
-            } else {
-                const mp3src = constructMp3SourceUrl(dayOfYear);
-                document.getElementById('audio').innerHTML = `
-                    <audio src="${mp3src}" controls preload="metadata">
-                        <div>
-                            Nažalost, vaš preglednik ne podržava ovaj element. Preuzmi <a href="${mp3src}">MP3</a> audio datoteku.
-                        </div>
-                    </audio>
-                `;
-            }
+            const mp3src = `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
+            document.getElementById('audio').innerHTML = `
+                <audio src="${mp3src}" controls preload="metadata">
+                    <div>
+                        Nažalost, vaš preglednik ne podržava ovaj element. Preuzmi <a href="${mp3src}">MP3</a> audio datoteku.
+                    </div>
+                </audio>
+            `;
 
             // pagination
-            document.getElementById('prev').href = `?day=${dayOfYear > 1 ? dayOfYear-1 : 1}`;
+            const prevDate = new Date(date);
+            prevDate.setDate(prevDate.getDate() - 1);
+            document.getElementById('prev').href = `?datum=${prevDate.getDate()}-${prevDate.getMonth()+1}-${prevDate.getFullYear()}`;
+
             document.getElementById('today').href = 'index.html';
-            document.getElementById('next').href = `?day=${dayOfYear < 365 ? dayOfYear+1 : 365}`;
+
+            const nextDate = new Date(date);
+            nextDate.setDate(nextDate.getDate() + 1);
+            document.getElementById('next').href = `?datum=${nextDate.getDate()}-${nextDate.getMonth()+1}-${nextDate.getFullYear()}`;
+        }
+
+        function onLoad() {
+            const datum = new URLSearchParams(window.location.search).get('datum');
+            if (datum) {
+                const [day, month, year] = datum.split('-', 3);
+                const date = new Date(year, month - 1, day);
+                renderForDate(date);
+            } else {
+                const today = new Date();
+                renderForDate(today);
+            }
         }
 
         window.onload = onLoad;
