@@ -13,7 +13,7 @@
     <blockquote>
         <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
         <div>Poslušajte:</div>
-        <audio id="audio" controls preload="metadata"></audio>
+        <div id="audio"></div>
     </blockquote>
     <br>
     <nav><a id="prev">Prethodni dan</a> ⇽ <a id="today">Danas</a> ⇾ <a id="next">Slijedeći dan</a></nav>
@@ -40,7 +40,7 @@
             return dayOfYear;
         }
 
-        function constructSourceUrl(dayOfYear) {
+        function constructMp3SourceUrl(dayOfYear) {
             const start = new Date(2022, 0, 0);
             const diff = dayOfYear * 24 * 60 * 60 * 1000;
             const date = new Date(start.getTime() + diff);
@@ -64,9 +64,20 @@
             document.getElementById('reading').innerText = reading;
             document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
 
-            const src = constructSourceUrl(dayOfYear);
-            document.getElementById('audio').src = src;
-            document.getElementById('audio').innerHTML = `<p>Preuzmi <a href="${src}">MP3</a> audio datoteku.</p>`;
+            // TODO: add audio for 29.2. and 30.7.
+            const isDay211 = dayOfYear == 211; // 30.7.
+            if (isDay211) {
+                document.getElementById('audio').innerHTML = `<div>Nažalost, za ovaj dan nema snimljenog čitanja.</div>`;
+            } else {
+                const mp3src = constructMp3SourceUrl(dayOfYear);
+                document.getElementById('audio').innerHTML = `
+                    <audio src="${mp3src}" controls preload="metadata">
+                        <div>
+                            Nažalost, vaš preglednik ne podržava ovaj element. Preuzmi <a href="${mp3src}">MP3</a> audio datoteku.
+                        </div>
+                    </audio>
+                `;
+            }
 
             // pagination
             document.getElementById('prev').href = `?day=${dayOfYear > 1 ? dayOfYear-1 : 1}`;
