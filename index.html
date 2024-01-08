@@ -7,19 +7,16 @@
     <script src="readings.js"></script>
 </head>
 <body>
-    <h1>Biblija365</h1>
-    <p>Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.</p>
-    <h2 id="day_of_year"></h2>
+    <h1><u>Biblija365</u></h1>
+    <p><i>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.“</i></p>
+    <h3 id="day_of_year"></h3>
     <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
     <div>Poslušajte:</div>
     <audio id="audio" controls preload="metadata"></audio>
-    <p id="pagination"></p>
-    <div>
-        <small>Preuzeto sa: <a href="https://www.radiomarija.hr">radiomarija.hr</a>.</small>
-    </div>
-    <div>
-        <small>Autor: <a href="https://github.com/IvanVnucec">Ivan Vnučec</a>, 2024.</small>
-    </div>
+    <p><a id="prev">Prethodni dan</a> « <a id="today">Danas</a> » <a id="next">Slijedeći dan</a></p>
+    <hr>
+    <div><small>Preuzeto sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
+    <div><small>Autor: Ivan Vnučec, 2024.</small></div>
 
     <script>
         function getDayOfTheYear(date) {
@@ -69,13 +66,9 @@
             document.getElementById('audio').innerHTML = `<p>Preuzmi <a href="${src}">MP3</a> audio datoteku.</p>`;
 
             // pagination
-            document.getElementById('pagination').innerHTML = `
-                <a href="?day=${dayOfYear > 1 ? dayOfYear-1 : 1}">Prethodni dan</a>
-                |
-                <a href="index.html">Danas</a>
-                |
-                <a href="?day=${dayOfYear < 365 ? dayOfYear+1 : 365}">Slijedeći dan</a>
-            `;
+            document.getElementById('prev').href = `?day=${dayOfYear > 1 ? dayOfYear-1 : 1}`;
+            document.getElementById('today').href = 'index.html';
+            document.getElementById('next').href = `?day=${dayOfYear < 365 ? dayOfYear+1 : 365}`;
         }
 
         window.onload = onLoad;
