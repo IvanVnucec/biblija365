@@ -9,16 +9,22 @@
 <body>
     <h1><u>Biblija365</u></h1>
     <p><i>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.”</i></p>
+    <br>
     <h3 id="day_of_year"></h3>
+    <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
+    <p>Poslušajte:</p>
     <blockquote>
-        <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
-        <div>Poslušajte:</div>
-        <div id="audio"></div>
+        <div id="audio_player"></div>
+        <small>Brzina: </small><button id="speed_change_text" onclick="changeSpeed()">1.00x</button>
+        <small>Vrijeme: </small><button onclick="seekPlayer(-10)">-10s</button> <button onclick="seekPlayer(10)">+10s</button>
     </blockquote>
     <br>
+    <br>
+    <br>
     <nav><a id="prev">Prethodni dan</a> ⇽ <a id="today">Danas</a> ⇾ <a id="next">Slijedeći dan</a></nav>
+    <br>
     <hr>
-    <div><small>Preuzeto sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
+    <div><small>Snimke preuzete sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
     <div><small>Autor: Ivan Vnučec, 2024.</small></div>
 
     <script>
@@ -40,7 +46,7 @@
             document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
 
             const mp3src = `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
-            document.getElementById('audio').innerHTML = `
+            document.getElementById('audio_player').innerHTML = `
                 <audio src="${mp3src}" controls preload="metadata">
                     <div>
                         Nažalost, vaš preglednik ne podržava ovaj element. Preuzmi <a href="${mp3src}">MP3</a> audio datoteku.
@@ -58,6 +64,29 @@
             const nextDate = new Date(date);
             nextDate.setDate(nextDate.getDate() + 1);
             document.getElementById('next').href = `?datum=${nextDate.getDate()}-${nextDate.getMonth()+1}-${nextDate.getFullYear()}`;
+        }
+
+        function seekPlayer(seconds) {
+            const audio = document.querySelector('audio');
+            audio.currentTime += seconds;
+        }
+
+        function changeSpeed() {
+            const audio = document.querySelector('audio');
+            const speedChangeText = document.getElementById('speed_change_text');
+            if (audio.playbackRate === 1) {
+                audio.playbackRate = 1.25;
+                speedChangeText.innerText = '1.25x';
+            } else if (audio.playbackRate === 1.25) {
+                audio.playbackRate = 1.5;
+                speedChangeText.innerText = '1.50x';
+            } else if (audio.playbackRate === 1.5) {
+                audio.playbackRate = 0.75;
+                speedChangeText.innerText = '0.75x';
+            } else if (audio.playbackRate === 0.75) {
+                audio.playbackRate = 1;
+                speedChangeText.innerText = '1.00x';
+            }
         }
 
         function onLoad() {
