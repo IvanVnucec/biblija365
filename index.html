@@ -4,47 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblija365</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="readings.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Biblija365</h1>
-        <p>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.”</p>
-    </header>
+    <h1><u>Biblija365</u></h1>
+    <p><i>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.”</i></p>
+    <br>
+    <h3 id="day_of_year"></h3>
+    <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
+    <p>Poslušajte:</p>
+    <blockquote>
+        <div id="audio_player"></div>
+        <small>Brzina: </small><button id="speed_change_text" onclick="changeSpeed()">1.00x</button>
+        <small>Vrijeme: </small><button onclick="seekPlayer(-10)">-10s</button> <button onclick="seekPlayer(10)">+10s</button>
+    </blockquote>
+    <br>
+    <br>
+    <br>
+    <nav><a id="prev">Prethodni dan</a> ⇽ <a id="today">Danas</a> ⇾ <a id="next">Slijedeći dan</a></nav>
+    <br>
+    <hr>
+    <div><small>Snimke preuzete sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
+    <div><small>Autor: Ivan Vnučec, 2024.</small></div>
 
-    <div class="card">
-        <div class="card-container">
-            <h2 id="day_of_year"></h2>
-            <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
+    <script>
+        function getDayOfTheYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = (date - start);
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.floor(diff / oneDay);
+        }
 
-            <div class="audio">
-                <div id="player"></div>
-                <div class="controls">
-                    <span>
-                        Brzina: <button id="speed_change_text" onclick="changeSpeed()">1.00x</button>
-                    </span>
-                    <span>
-                        Vrijeme: <button onclick="seekPlayer(-10)">-10s</button> <button onclick="seekPlayer(10)">+10s</button>
-                    </span>
-                </div>
-            </div>
+        function renderForDate(date) {
+            const dayOfTheYear = getDayOfTheYear(date);
+            document.getElementById('day_of_year').innerText = `Dan ${dayOfTheYear}:`;
 
-            <div class="pagination">
-                <div>Navigacija:</div>
-                <nav>
-                    <button id="prev">Prethodni dan</button>
-                    <button id="today">Danas</button>
-                    <button id="next">Slijedeći dan</button>
-                </nav>
-            </div>
-        </div>
-    </div>
+            const monthStr = String(date.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(date.getDate()).padStart(2, '0');
+            const reading = readingsList[`${monthStr}${dayStr}`];
+            document.getElementById('reading').innerText = reading;
+            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
 
-    <footer>
-        <div>Snimke preuzete sa: <a href="https://www.radiomarija.hr">radiomarija.hr</a>.</div>
-        <div>Autor: Ivan Vnučec, 2024.</div>
-    </footer>
+            const mp3src = `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
+            document.getElementById('audio_player').innerHTML = `
+                <audio src="${mp3src}" controls preload="metadata">
+                    <div>
+                        Nažalost, vaš preglednik ne podržava ovaj element. Preuzmi <a href="${mp3src}">MP3</a> audio datoteku.
+                    </div>
+                </audio>
+            `;
 
-    <script src="script.js"></script>
+            // pagination
+            const prevDate = new Date(date);
+            prevDate.setDate(prevDate.getDate() - 1);
+            document.getElementById('prev').href = `?datum=${prevDate.getDate()}-${prevDate.getMonth()+1}-${prevDate.getFullYear()}`;
+
+            document.getElementById('today').href = 'index.html';
+
+            const nextDate = new Date(date);
+            nextDate.setDate(nextDate.getDate() + 1);
+            document.getElementById('next').href = `?datum=${nextDate.getDate()}-${nextDate.getMonth()+1}-${nextDate.getFullYear()}`;
+        }
+
+        function seekPlayer(seconds) {
+            const audio = document.querySelector('audio');
+            audio.currentTime += seconds;
+        }
+
+        function changeSpeed() {
+            const audio = document.querySelector('audio');
+            const speedChangeText = document.getElementById('speed_change_text');
+            if (audio.playbackRate === 1) {
+                audio.playbackRate = 1.25;
+                speedChangeText.innerText = '1.25x';
+            } else if (audio.playbackRate === 1.25) {
+                audio.playbackRate = 1.5;
+                speedChangeText.innerText = '1.50x';
+            } else if (audio.playbackRate === 1.5) {
+                audio.playbackRate = 0.75;
+                speedChangeText.innerText = '0.75x';
+            } else if (audio.playbackRate === 0.75) {
+                audio.playbackRate = 1;
+                speedChangeText.innerText = '1.00x';
+            }
+        }
+
+        function onLoad() {
+            const datum = new URLSearchParams(window.location.search).get('datum');
+            if (datum) {
+                const [day, month, year] = datum.split('-', 3);
+                const date = new Date(year, month - 1, day);
+                renderForDate(date);
+            } else {
+                const today = new Date();
+                renderForDate(today);
+            }
+        }
+
+        window.onload = onLoad;
+    </script>
 </body>
 </html>
