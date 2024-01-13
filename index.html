@@ -40,7 +40,7 @@
             const monthStr = String(date.getMonth()+1).padStart(2, '0');
             const yearStr = String(date.getFullYear());
             const dayOfTheYear = getDayOfTheYear(date);
-            document.getElementById('day_of_year').innerText = `${dayStr}.${monthStr}.${yearStr}. - Dan ${dayOfTheYear}:`;
+            document.getElementById('day_of_year').innerText = `${dayStr}.${monthStr}.${yearStr}. - Dan ${dayOfTheYear}.:`;
 
             const reading = readingsList[`${monthStr}${dayStr}`];
             document.getElementById('reading').innerText = reading;
