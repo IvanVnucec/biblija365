@@ -5,27 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblija365</title>
     <script src="readings.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1><u>Biblija365</u></h1>
-    <p><i>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.”</i></p>
-    <br>
-    <h3 id="day_of_year"></h3>
-    <p>Čitanje: <cite><a id="reading" target="_blank"></a></cite></p>
-    <p>Poslušajte:</p>
-    <blockquote>
+    <header>
+        <h1>Biblija365</h1>
+        <p><i>„Plan čitanja Biblije kroz čitavu godinu u glasovnom obliku.”</i></p>
+    </header>
+
+    <div class="content">
+        <h2 id="day_of_year"></h2>
+        <div class="preading">
+            <p>Čitanje: <cite><a id="reading" target="_blank"></a> </cite><sup><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg=="></sup></p>
+        </div>
+        <p>Poslušajte:</p>
         <div id="audio_player"></div>
-        <small>Brzina: </small><button id="speed_change_text" onclick="changeSpeed()">1.00x</button>
-        <small>Vrijeme: </small><button onclick="seekPlayer(-10)">-10s</button> <button onclick="seekPlayer(10)">+10s</button>
-    </blockquote>
-    <br>
-    <br>
-    <br>
-    <nav><a id="prev">Prethodni dan</a> ⇽ <a id="today">Danas</a> ⇾ <a id="next">Slijedeći dan</a></nav>
-    <br>
-    <hr>
-    <div><small>Snimke preuzete sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
-    <div><small>Autor: Ivan Vnučec, 2024.</small></div>
+        <div class="controls">
+            <div>
+                <small>Brzina: </small><button id="speed_change_text" onclick="changeSpeed()">1.00x</button>
+            </div>
+            <div>
+                <small>Vrijeme: </small><button onclick="seekPlayer(-10)">-10s</button> <button onclick="seekPlayer(10)">+10s</button>
+            </div>
+        </div>
+        <nav><a id="prev">Prethodni dan</a> ⇽ <a id="today">Danas</a> ⇾ <a id="next">Slijedeći dan</a></nav>
+    </div>
+
+    <footer>
+        <div><small>Snimke preuzete sa: <cite><a href="https://www.radiomarija.hr">radiomarija.hr</a></cite>.</small></div>
+        <div><small>Autor: Ivan Vnučec, 2024.</small></div>
+    </footer>
 
     <script>
         function getDayOfTheYear(date) {
@@ -36,12 +45,11 @@
         }
 
         function renderForDate(date) {
+            const dayOfTheYear = getDayOfTheYear(date);
+            document.getElementById('day_of_year').innerText = `Dan ${dayOfTheYear}`;
+
             const dayStr = String(date.getDate()).padStart(2, '0');
             const monthStr = String(date.getMonth()+1).padStart(2, '0');
-            const yearStr = String(date.getFullYear());
-            const dayOfTheYear = getDayOfTheYear(date);
-            document.getElementById('day_of_year').innerText = `${dayStr}.${monthStr}.${yearStr}. - Dan ${dayOfTheYear}.:`;
-
             const reading = readingsList[`${monthStr}${dayStr}`];
             document.getElementById('reading').innerText = reading;
             document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
