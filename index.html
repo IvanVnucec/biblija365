@@ -53,7 +53,12 @@
             const monthStr = String(date.getMonth()+1).padStart(2, '0');
             const reading = readingsList[`${monthStr}${dayStr}`];
             document.getElementById('reading').innerText = reading;
-            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${reading}&compact=1&id40=1&set=1&l=en`;
+
+            function customEncode(str) {
+                const charMap = { 'Š': '%C5', 'š': '%9A', 'Č': '%C8', 'č': '%E8', 'Ć': '%C6', 'ć': '%E6', 'Đ': '%D0', 'đ': '%F0', 'Ž': '%8E', 'ž': '%9E', ' ': '+'};
+                return str.split('').map(char => charMap[char] || encodeURIComponent(char)).join('');
+            }
+            document.getElementById('reading').href = `https://www.biblija.net/biblija.cgi?Bible=Bible&m=${customEncode(reading)}&compact=1&id40=1&set=1&l=en`;
 
             const mp3src = `https://github.com/IvanVnucec/biblija365-recordings/raw/master/recordings/biblija2022${monthStr}${dayStr}.mp3`;
             document.getElementById('audio_player').innerHTML = `
